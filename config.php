@@ -134,7 +134,8 @@ function question_types(): array {
       'datetime'=>'Дата и время',
       'date'=>'Дата',
       'phone'=>'Телефон',
-      'photo'=>'Фото'
+      'photo'=>'Фото',
+      'section'=>'Раздел / группа вопросов'
     ];
 }
 function resize_uploaded_image(string $src,string $dst,string $mime,int $maxW=640,int $maxH=480): bool {
