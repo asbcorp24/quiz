@@ -170,15 +170,20 @@ function resize_uploaded_image(string $src,string $dst,string $mime,int $maxW=64
     imagedestroy($source);imagedestroy($target);return $ok;
 }
 
-// Старые опросы автоматически получают прежние 4 поля в новом конструкторе.
-$legacy=$pdo->query("SELECT s.id FROM surveys s WHERE NOT EXISTS(SELECT 1 FROM questions q WHERE q.survey_id=s.id)")->fetchAll();
-if($legacy){
-  $ins=$pdo->prepare("INSERT INTO questions(survey_id,label,type,is_required,sort_order,settings_json) VALUES(?,?,?,?,?,?)");
-  foreach($legacy as $s){
-    $sid=(int)$s['id'];
-    $ins->execute([$sid,'Ваша оценка','rating',1,10,'{}']);
-    $ins->execute([$sid,'Коротко опишите ситуацию','textarea',1,20,'{"max_length":300}']);
-    $ins->execute([$sid,'Дата и время посещения','datetime',1,30,'{}']);
-    $ins->execute([$sid,'Фото — при необходимости','photo',0,40,'{"max_files":3}']);
+// Одноразовая миграция старых опросов в новый конструктор.
+$pdo->exec("CREATE TABLE IF NOT EXISTS app_meta (key TEXT PRIMARY KEY, value TEXT DEFAULT '')");
+$migrated=$pdo->query("SELECT value FROM app_meta WHERE key='quiz_builder_migrated'")->fetchColumn();
+if($migrated===false){
+  $legacy=$pdo->query("SELECT s.id FROM surveys s WHERE NOT EXISTS(SELECT 1 FROM questions q WHERE q.survey_id=s.id)")->fetchAll();
+  if($legacy){
+    $ins=$pdo->prepare("INSERT INTO questions(survey_id,label,type,is_required,sort_order,settings_json) VALUES(?,?,?,?,?,?)");
+    foreach($legacy as $s){
+      $sid=(int)$s['id'];
+      $ins->execute([$sid,'Ваша оценка','rating',1,10,'{}']);
+      $ins->execute([$sid,'Коротко опишите ситуацию','textarea',1,20,'{"max_length":300}']);
+      $ins->execute([$sid,'Дата и время посещения','datetime',1,30,'{}']);
+      $ins->execute([$sid,'Фото — при необходимости','photo',0,40,'{"max_files":3}']);
+    }
   }
+  $pdo->prepare("INSERT OR REPLACE INTO app_meta(key,value) VALUES('quiz_builder_migrated','1')")->execute();
 }
