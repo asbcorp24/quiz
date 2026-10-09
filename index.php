@@ -17,6 +17,7 @@ if($_SERVER['REQUEST_METHOD']==='POST' && $survey){
  $answers=[];$ratingLegacy=0;$commentLegacy='';$visitedLegacy=date('Y-m-d H:i:s');$photoJobs=[];
  foreach($questions as $x){
    $qid=(int)$x['id'];$type=$x['type'];$name='q_'.$qid;$value=trim((string)($_POST[$name]??''));$set=json_decode($x['settings_json']?:'{}',true)?:[];
+   if($type==='section') continue;
    if($type==='photo'){
      $files=$_FILES[$name]??null;$count=0;
      if($files && is_array($files['name'])){
@@ -84,8 +85,9 @@ if($_SERVER['REQUEST_METHOD']==='POST' && $survey){
 <?php if($errors):?><div class="alert alert-danger"><?php foreach($errors as $e):?><div><?=h($e)?></div><?php endforeach;?></div><?php endif;?>
 <form method="post" enctype="multipart/form-data" class="glass rounded-4 p-4 p-md-5"><input type="hidden" name="_csrf" value="<?=h(csrf_token())?>">
 <?php if($survey['collect_gps']):?><input type="hidden" name="gps_lat" id="gps_lat"><input type="hidden" name="gps_lng" id="gps_lng"><input type="hidden" name="gps_acc" id="gps_acc"><div class="alert alert-info py-2 small">Этот квиз запрашивает геопозицию. Браузер отдельно попросит разрешение.</div><?php endif;?>
-<?php foreach($questions as $i=>$x):$n='q_'.$x['id'];$set=json_decode($x['settings_json']?:'{}',true)?:[];?>
-<div class="mb-4"><label class="form-label fw-semibold"><?=($i+1)?>. <?=h($x['label'])?> <?=$x['is_required']?'<span class="text-danger">*</span>':''?></label>
+<?php $questionNo=0; foreach($questions as $i=>$x):$n='q_'.$x['id'];$set=json_decode($x['settings_json']?:'{}',true)?:[];?>
+<?php if($x['type']==='section'):?><div class="quiz-section my-5"><div class="smallcaps">Раздел</div><h2 class="h3 mb-2"><?=h($x['label'])?></h2><?php if(!empty($set['description'])):?><p class="text-muted2 mb-0"><?=nl2br(h((string)$set['description']))?></p><?php endif;?></div><?php continue; endif; $questionNo++;?>
+<div class="mb-4"><label class="form-label fw-semibold"><?=$questionNo?>. <?=h($x['label'])?> <?=$x['is_required']?'<span class="text-danger">*</span>':''?></label>
 <?php if($x['type']==='rating'):?><div class="rating"><?php for($v=1;$v<=5;$v++):?><input type="radio" name="<?=$n?>" id="<?=$n.'_'.$v?>" value="<?=$v?>" <?=($_POST[$n]??'')==$v?'checked':''?>><label for="<?=$n.'_'.$v?>"><?=$v?>★</label><?php endfor;?></div>
 <?php elseif($x['type']==='textarea'):?><textarea class="form-control" name="<?=$n?>" rows="5" maxlength="<?=(int)($set['max_length']??300)?>" <?=$x['is_required']?'required':''?>><?=h($_POST[$n]??'')?></textarea>
 <?php elseif($x['type']==='datetime'):?><input class="form-control" type="datetime-local" name="<?=$n?>" value="<?=h($_POST[$n]??'')?>" <?=$x['is_required']?'required':''?>>
