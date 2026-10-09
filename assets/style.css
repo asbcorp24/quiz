@@ -60,3 +60,18 @@ hr{border-color:#183b45}
 a{color:#61e9df}
 .smallcaps{font-size:.75rem;letter-spacing:.11em;text-transform:uppercase;color:#6d949d}
 .circuit-line{height:1px;background:linear-gradient(90deg,transparent,var(--cyan),transparent);opacity:.35}
+
+.quiz-section{
+  position:relative;padding:1.35rem 1.45rem 1.25rem;border-radius:1rem;
+  background:linear-gradient(135deg,rgba(64,245,220,.10),rgba(52,186,255,.055));
+  border:1px solid rgba(64,245,220,.22);overflow:hidden
+}
+.quiz-section:before{
+  content:"";position:absolute;left:0;top:0;bottom:0;width:4px;
+  background:linear-gradient(180deg,var(--cyan),var(--cyan2))
+}
+.quiz-section h2{color:#eaffff;font-weight:800;letter-spacing:-.02em}
+.section-admin-card{
+  border-color:rgba(52,186,255,.32)!important;
+  background:linear-gradient(145deg,rgba(52,186,255,.09),rgba(64,245,220,.035))!important
+}
