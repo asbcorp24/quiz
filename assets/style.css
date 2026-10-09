@@ -75,3 +75,10 @@ a{color:#61e9df}
   border-color:rgba(52,186,255,.32)!important;
   background:linear-gradient(145deg,rgba(52,186,255,.09),rgba(64,245,220,.035))!important
 }
+
+.edit-question-box{
+  background:rgba(4,15,20,.58);
+  border:1px solid rgba(64,245,220,.12)
+}
+details>summary{list-style:none;cursor:pointer}
+details>summary::-webkit-details-marker{display:none}
